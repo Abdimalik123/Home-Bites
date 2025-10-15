@@ -1,0 +1,25 @@
+# --- Backend (Python) ---
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.venv/
+*.log
+
+# --- Frontend (Node/Vite/TypeScript) ---
+node_modules/
+dist/
+build/
+*.log
+*.lock
+.env.local
+.env.development
+.env.production
+
+# --- OS & Editor junk ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
