@@ -1,12 +1,9 @@
 from flask import Blueprint, g, jsonify, request
 from routes.auth import login_required
 from db import conn
-
-
-
-
-
 comment_bp = Blueprint('comment_bp', __name__)
+
+
 
 
 @comment_bp.route('/recipes/<int:recipe_id>/comment', methods = ['POST'])
