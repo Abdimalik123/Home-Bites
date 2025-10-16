@@ -35,16 +35,19 @@ def add_comment(recipe_id):
 @login_required
 def get_comments(recipe_id):
     cursor = conn.cursor()
-    cursor.execute("SELECT u.first_name, u.last_name, c.text, c.rating, c.created_at FROM comments c JOIN users u ON u.id = c.user_id WHERE c.recipe_id = %s" , (recipe_id,))
+    cursor.execute("SELECT u.first_name, u.last_name, c.text, c.rating, c.created_at, c.id FROM comments c JOIN users u ON u.id = c.user_id WHERE c.recipe_id = %s" , (recipe_id,))
     rows = cursor.fetchall()
 
     comments = [
         {
+        
         "first_name": row[0],
         "last_name": row[1],
         "text": row[2],
         "rating": row[3],
-        "created_at": row[4].isoformat()
+        "created_at": row[4].isoformat(),
+        "id":row[5]
+        
         }
         for row in rows
     ]
@@ -58,7 +61,7 @@ def delete_comment(comment_id):
     user_id = g.user['user_id']
     cursor = conn.cursor()
 
-    cursor.execute("SELECT user_id FROM comments WHERE id = %s", (comment_id))
+    cursor.execute("SELECT user_id FROM comments WHERE id = %s", (comment_id,))
     result= cursor.fetchone()
 
     if result is None:
@@ -69,7 +72,7 @@ def delete_comment(comment_id):
     if comment_user_id != user_id:
         return jsonify({"error": "Unauthorized attempt"}), 403
     
-    cursor.execute("DELETE FROM comments WHERE id = %s", (comment_id))
+    cursor.execute("DELETE FROM comments WHERE id = %s", (comment_id,))
     conn.commit()
     cursor.close()
     return jsonify({"message":"Comment deleted successfully"}), 200
