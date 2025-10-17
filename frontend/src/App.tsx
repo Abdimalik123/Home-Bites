@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -7,12 +7,25 @@ import RecipeDetailPage from './pages/RecipeDetailPage';
 import ProfilePage from './pages/ProfilePage';
 
 function App() {
+  const location = useLocation(); // Get current route path
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow p-4">
         <nav className="flex justify-center space-x-4">
-          <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
-          <Link to="/register" className="text-green-600 hover:underline">Register</Link>
+          {/* Show Login button only on /register */}
+          {location.pathname === '/register' && (
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Login
+            </Link>
+          )}
+
+          {/* Show Register button only on /login */}
+          {location.pathname === '/login' && (
+            <Link to="/register" className="text-green-600 hover:underline">
+              Register
+            </Link>
+          )}
         </nav>
       </header>
 
