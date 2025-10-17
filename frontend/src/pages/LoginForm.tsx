@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {login, setToken} from '../services/auth';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -6,35 +7,24 @@ function LoginForm() {
   const [message, setMessage] = useState("");
 
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Login submitted:', { email, password });
     
-    fetch("http://127.0.0.1:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-  
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setMessage(data.message || "Login successful!");
+    try {
+      const response = await login(email, password);
+        if (response.success) {
+          if (response.token) setToken(response.token);
+          setMessage(response.message || "Login successful!");
         } else {
-          setMessage(data.error || "Login failed.");
+          setMessage(response.error || "Login failed.");
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+      } catch (err) {
+        console.error(err);
         setMessage("Something went wrong. Please try again.");
-      });
-      console.log("Im here")
-  };
+      }
+    };
+    
 
   return (
     <form onSubmit={onSubmit} className="max-w-md w-full p-6 bg-white rounded-lg shadow space-y-6">

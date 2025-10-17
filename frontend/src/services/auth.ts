@@ -1,9 +1,4 @@
-const API_URL= 'https://localhsot:5000'; // backend url
-
-
-
-
-
+const API_URL= 'https://localhost:5000'; // backend url
 
 export async function login(email: string, password: string) {
   const res = await fetch(`${API_URL}/login`, {
@@ -14,7 +9,7 @@ export async function login(email: string, password: string) {
   return res.json();
 }
 
-export async function register(data: { first_name: string, last_name: string, email: string, password: string, confirm_password: string}) {
+export async function register(data: { firstname: string, lastname: string, email: string, password: string, confirm_password: string}) {
   const res = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

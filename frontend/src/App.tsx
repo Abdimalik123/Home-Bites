@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import AllRecipesPage from './pages/AllRecipesPage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes" element={<AllRecipesPage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />

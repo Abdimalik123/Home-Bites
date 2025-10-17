@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {register} from '../services/auth';
 
 function RegisterForm() {
   const [firstname, setFirstname] = useState("");
@@ -8,42 +9,36 @@ function RegisterForm() {
   const [confirm_password, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (password !== confirm_password) {
       alert("Passwords do not match");
       return;
     }
-
-    fetch("http://127.0.0.1:5000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstname,
-        lastname,
-        email,
-        password,
-        confirm_password
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setMessage(data.message || "Registration successful!");
-        } else {
-          setMessage(data.error || "Registration failed.");
+    const data = {
+      firstname: firstname,
+      lastname: lastname,
+      email,
+      password,
+      confirm_password,
+    };
+    
+    try {
+      const response = await register(data);
+      if (response.success) {
+        setMessage(response.message || "Registration successful!");
+      } 
+      else {
+        setMessage(response.error || "Registration failed.");
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+      } 
+      catch (err) {
+        console.error(err);
         setMessage("Something went wrong. Please try again.");
-      });
-  };
-
-  return (
+      }
+    };
+    
+    return (
     <form
       onSubmit={onSubmit}
       className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow space-y-6"

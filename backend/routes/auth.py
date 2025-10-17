@@ -40,68 +40,67 @@ auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/register', methods = ['POST'])
 def register():
-    if request.method == 'POST':
-        data = request.get_json()
-        firstname = data.get('firstname')
-        lastname = data.get('lastname')
-        email = data.get('email')
-        password = data.get('password')
-        confirm_password = data.get('confirm_password')
+    
+    data = request.get_json()
+    firstname = data.get('firstname')
+    lastname = data.get('lastname')
+    email = data.get('email')
+    password = data.get('password')
+    confirm_password = data.get('confirm_password')
 
-        cursor = conn.cursor()
+    cursor = conn.cursor()
 
-        if not firstname:
-            return jsonify({ "success": False, "error": "Type in your first name"})
-        if not lastname:
-            return jsonify({ "success": False, "error": "Type in your last name"})
-        if not email:
-            return jsonify({ "success": False, "error": "Type in your email"})
-        if not password:
-            return jsonify({ "success": False, "error": "Type in your password"})
-        if not confirm_password:
-            return jsonify({ "success": False, "error": "Confirm your password"})
-        if confirm_password != password:
-            return jsonify({ "success": False, "error": "The passwords do not match"})
+    if not firstname:
+        return jsonify({ "success": False, "error": "Type in your first name"})
+    if not lastname:
+        return jsonify({ "success": False, "error": "Type in your last name"})
+    if not email:
+        return jsonify({ "success": False, "error": "Type in your email"})
+    if not password:
+        return jsonify({ "success": False, "error": "Type in your password"})
+    if not confirm_password:
+        return jsonify({ "success": False, "error": "Confirm your password"})
+    if confirm_password != password:
+        return jsonify({ "success": False, "error": "The passwords do not match"})
         
         
-        try:
-            cursor.execute("SELECT email FROM users WHERE email=%s", (email,))
-            existing_email = cursor.fetchone()
-            
-            if existing_email:
-                return jsonify({"success": False, "error": "Email already exists"})
-            else:
-                hashed_password = generate_password_hash(password)
-                cursor.execute("INSERT INTO users (email, password_hash, first_name, last_name) VALUES (%s, %s, %s, %s) RETURNING id", (email, hashed_password, firstname, lastname))
-                new_user_id = cursor.fetchone()[0]
-                conn.commit()
-                return jsonify({"success": True, "message": "Registration successful", "user_id": new_user_id})
+    try:
+        cursor.execute("SELECT email FROM users WHERE email=%s", (email,))
+        existing_email = cursor.fetchone()
         
-        except Exception as e:
-            return jsonify({"success": False, "message": str(e)})
-        finally:
-            cursor.close()
-        
-    payload = {
+        if existing_email:
+            return jsonify({"success": False, "error": "Email already exists"})
+       
+        hashed_password = generate_password_hash(password)
+        cursor.execute("INSERT INTO users (email, password_hash, first_name, last_name) VALUES (%s, %s, %s, %s) RETURNING id", (email, hashed_password, firstname, lastname))
+        new_user_id = cursor.fetchone()[0]
+        conn.commit()
+
+        payload = {
             "user_id": new_user_id,
-            "first_name": firstname,
-            "last_name": lastname,
-            "exp": int((datetime.utcnow() + timedelta(hours=24)).timestamp())
-            }
-    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
-
-    return {
-        "success": True,
-        "user": {
-            "id": new_user_id,
-            "first_name": firstname,
-            "last_name": lastname,
-            "email": email
-        },
-        "token": token
+        "first_name": firstname,
+        "last_name": lastname,
+        "exp": int((datetime.utcnow() + timedelta(hours=24)).timestamp())
         }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
+        return jsonify({
+            "success": True,
+            "message": "Registration successful",
+            "user": {
+                "id": new_user_id,
+                "first_name": firstname,
+                "last_name": lastname,
+                "email": email
+                },
+                "token": token
+                })
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+    finally:
+        cursor.close()
+    
 
 @auth_bp.route('/login', methods = ['POST'])
 def login():
