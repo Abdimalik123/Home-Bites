@@ -14,7 +14,6 @@ def home():
 
 
 @recipe_bp.route('/recipes', methods = ['GET'])
-@login_required
 def all_recipes():
     cursor = conn.cursor()
     cursor.execute("""
